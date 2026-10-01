@@ -1,0 +1,122 @@
+#include <iostream>
+#include <stdexcept>
+#include <algorithm>
+
+template <typename E>
+class ArrayList {
+public:
+    ArrayList();
+    ~ArrayList();
+    int size() const;
+    bool empty() const;
+    E& operator[](int i);
+    E& at(int i);
+    void insert(int i, const E& e);
+    void erase(int i);
+    void reserve(int N);
+    void print() const;
+
+private:
+    int capacity;
+    int n;
+    E* A;
+};
+
+template <typename E>
+ArrayList<E>::ArrayList() : capacity(0), n(0), A(nullptr) {}
+
+template <typename E>
+ArrayList<E>::~ArrayList() {
+    delete[] A;
+}
+
+template <typename E>
+int ArrayList<E>::size() const {
+    return n;
+}
+
+template <typename E>
+bool ArrayList<E>::empty() const {
+    return n == 0;
+}
+
+template <typename E>
+E& ArrayList<E>::operator[](int i) {
+    return A[i];
+}
+
+template <typename E>
+E& ArrayList<E>::at(int i) {
+    if (i < 0 || i >= n) {
+        throw std::out_of_range("Chi so vuot qua pham vi hop le!");
+    }
+    return A[i];
+}
+
+template <typename E>
+void ArrayList<E>::reserve(int N) {
+    if (capacity >= N) return;
+    E* B = new E[N];
+    for (int j = 0; j < n; j++) {
+        B[j] = A[j];
+    }
+    if (A != nullptr) delete[] A;
+    A = B;
+    capacity = N;
+}
+
+template <typename E>
+void ArrayList<E>::insert(int i, const E& e) {
+    if (i < 0 || i > n) {
+        throw std::out_of_range("Chi so chen khong hop le!");
+    }
+    if (n >= capacity) {
+        reserve(std::max(1, 2 * capacity));
+    }
+    for (int j = n - 1; j >= i; j--) {
+        A[j + 1] = A[j];
+    }
+    A[i] = e;
+    n++;
+}
+
+template <typename E>
+void ArrayList<E>::erase(int i) {
+    if (i < 0 || i >= n) {
+        throw std::out_of_range("Chi so xoa khong hop le!");
+    }
+    for (int j = i + 1; j < n; j++) {
+        A[j - 1] = A[j];
+    }
+    n--;
+}
+
+template <typename E>
+void ArrayList<E>::print() const {
+    std::cout << "[ ";
+    for (int j = 0; j < n; j++) {
+        std::cout << A[j] << (j < n - 1 ? ", " : " ");
+    }
+    std::cout << "] (size=" << n << ", capacity=" << capacity << ")\n";
+}
+
+int main() {
+    ArrayList<int> aList;
+
+    aList.insert(0, 10);
+    aList.insert(1, 20);
+    aList.insert(1, 15);
+    aList.insert(3, 30);
+    aList.insert(0, 5);
+
+    std::cout << "Mang sau khi chen: ";
+    aList.print();
+
+    std::cout << "Phan tu tai chi so 2: " << aList.at(2) << "\n";
+
+    aList.erase(1);
+    std::cout << "Mang sau khi xoa chi so 1: ";
+    aList.print();
+
+    return 0;
+}
